@@ -2,6 +2,8 @@ module Lex
 
 import Prelude.Chars
 
+%access public export
+
 data WhiteSpace = Tab | Space
 
 data SingleCharTokens = Slash | Dot | Star | Comma | Colon | Percent | Quote | DoubleQuote | NewLine
@@ -128,7 +130,7 @@ lex_one str with (unpack str)
 
 
 prog : String -> Nat -> String
-prog str n = substr n 1000 str
+prog str n = substr n 25 str
 
 lex_many : String -> List Token
 lex_many str with (lex_one str)
