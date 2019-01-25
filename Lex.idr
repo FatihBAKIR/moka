@@ -91,6 +91,21 @@ try_tokenize_name str with ((strHead str), (rest str))
       Nothing => Just (Identifier (singleton c))
     False => Nothing
 
+data StringParseErrors = NewLineInString | UnterminatedString | Done
+
+try_tokenize_string : String -> Bool -> Expected Literals StringParseErrors
+try_tokenize_string "" _ = Unexpected Done
+try_tokenize_string str is_open with (strHead str, strTail str, is_open)
+  | ('"', _, True) = Just (StringLiteral "\"")
+  | ('"', rest, False) = case try_tokenize_string rest True of
+    Just (StringLiteral res_str) => Just (StringLiteral (strCons '"' res_str))
+    Unexpected err => Unexpected err
+  | ('\n', _, _) = Unexpected NewLineInString
+  | (_, "", _) = Unexpected UnterminatedString
+  | (c, rest, open) = case try_tokenize_string rest open of
+    Just (StringLiteral res_str) => Just (StringLiteral (strCons c res_str))
+    Unexpected err => Unexpected err
+  
 legal_in_number : SingleCharTokens -> Bool -> Bool
 legal_in_number Dot _ = True
 legal_in_number (Alpha 'a') True = True
@@ -125,6 +140,7 @@ tokenize_number str has_dot is_hex with (tokenize_one (strHead str))
     (Comma, _) => Unexpected Fin
     (SemiColon, _) => Unexpected Fin
     (Colon, _) => Unexpected Fin
+    (RightParen, _) => Unexpected Fin
     
     (Dot, rst) => case has_dot of
       True => Unexpected MultipleDots
@@ -167,6 +183,10 @@ lex_one' all@(c::(str)) = case tokenize_one c of
     Unexpected err => (MkToken "" NullTok, 0)
 
   Just SemiColon => (MkToken ";" (Single SemiColon), 1)
+
+  Just DoubleQuote => case try_tokenize_string (pack all) False of
+    Just s@(StringLiteral str) => (MkToken str (Literal s), length str)
+    Unexpected err => (MkToken "" NullTok, 0)
 
   Just tok => case peek str of
     Nothing => (MkToken (singleton c) (Single tok), 1)
