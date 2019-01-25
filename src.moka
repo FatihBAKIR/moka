@@ -1,0 +1,7 @@
+import {vec3} from core.types;
+
+struct vertex
+{
+    vec3 position;
+    vec3 normal;
+}

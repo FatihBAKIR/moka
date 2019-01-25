@@ -1,41 +1,12 @@
 module Lex
 
 import Prelude.Chars
+import Tokens
+import PrettyTokens
 
 %access public export
 
-data SingleCharTokens = Plus | Assign | Slash | Dot | Star | Comma 
-                        | Colon | Percent | Quote | DoubleQuote | NewLine
-                        | Minus | SemiColon | LeftAngular | RightAngular
-                        | Digit Char | Alpha Char | Underscore | Whitespace
-
-data DoubleCharTokens = EqEq | PlusAssign | 
-                        MinusAssign | MulAssign | 
-                        DivAssign | Decrement | 
-                        Increment | LessEq | 
-                        GreatEq
-
-data Literals = StringLiteral String | 
-                IntegerLiteral String | 
-                FloatLiteral String
-
-data NameTok = Identifier String
-
-data Keywords = Struct | Void
-
-data TokenType =  Keyw Keywords | 
-                  Single SingleCharTokens | 
-                  DoubleT DoubleCharTokens | 
-                  Literal Literals | 
-                  Id NameTok | 
-                  NullTok
-
 data Expected t e = Just t | Unexpected e
-
-record Token where
-    constructor MkToken
-    text : String
-    tok : TokenType
 
 get_char : SingleCharTokens -> Char
 get_char (Digit c) = c
@@ -48,6 +19,9 @@ tokenize_one '=' = Just Assign
 
 tokenize_one '<' = Just LeftAngular
 tokenize_one '>' = Just RightAngular
+
+tokenize_one '{' = Just LeftBrace
+tokenize_one '}' = Just RightBrace
 
 tokenize_one '+' = Just Plus
 tokenize_one '-' = Just Minus
@@ -200,6 +174,8 @@ lex_one' all@(c::(str)) = case tokenize_one c of
 try_keywords : NameTok -> Maybe Keywords
 try_keywords (Identifier "struct") = Just Struct
 try_keywords (Identifier "void") = Just Void
+try_keywords (Identifier "import") = Just Import
+try_keywords (Identifier "from") = Just From
 try_keywords _ = Nothing
   
 lex_one : String -> (Token, Nat)
@@ -210,11 +186,12 @@ lex_one str with (unpack str)
       Just keyw => (MkToken res_str (Keyw keyw), n)
     tok => tok
 
-prog : String -> Nat -> String
-prog str n = substr n 25 str
+prog : String -> Integer -> String
+prog str 0 = str
+prog str n = prog (strTail str) (n - 1)
 
 lex_many : String -> List Token
 lex_many str with (lex_one str)
   | (_, Z) = []
-  | (MkToken _ NullTok, n) = lex_many (prog str n)
-  | (tok, n) = tok :: (lex_many (prog str n))
+  | (MkToken _ NullTok, n) = lex_many (prog str (cast n))
+  | (tok, n) = tok :: (lex_many (prog str (cast n)))

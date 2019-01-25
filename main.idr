@@ -1,6 +1,12 @@
 module Main
 
 import Lex
+import PrettyTokens
+import Prelude.Show
 
 main : IO ()
-main = putStrLn (cast ([1, 2, 3]))
+main = do
+  [prog, arg] <- getArgs
+  file <- readFile arg
+  case file of
+    Right str => putStrLn (show (lex_many str))
