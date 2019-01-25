@@ -25,6 +25,9 @@ Show SingleCharTokens where
   show Whitespace     = "Whitespace"
   show LeftBrace     = "LeftBrace"
   show RightBrace     = "RightBrace"
+  show LeftParen     = "LeftParen"
+  show RightParen     = "RightParen"
+  show At     = "At"
   show (Digit x) = "Digit " ++ (show x)
   show (Alpha x) = "Alpha " ++ (show x)
 
@@ -38,6 +41,7 @@ Show DoubleCharTokens where
   show Increment = "Increment"
   show LessEq = "LessEq"
   show GreatEq = "GreatEq"
+  show LambdaArrow = "LambdaArrow"
 
 Show Literals where
   show (StringLiteral str) = "StringLiteral " ++ (show str)

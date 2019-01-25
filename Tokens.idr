@@ -6,13 +6,14 @@ data SingleCharTokens = Plus | Assign | Slash | Dot | Star | Comma
                         | Colon | Percent | Quote | DoubleQuote | NewLine
                         | Minus | SemiColon | LeftAngular | RightAngular
                         | Digit Char | Alpha Char | Underscore | Whitespace
-                        | LeftBrace | RightBrace
+                        | LeftBrace | RightBrace | LeftParen | RightParen
+                        | At
 
 data DoubleCharTokens = EqEq | PlusAssign | 
                         MinusAssign | MulAssign | 
                         DivAssign | Decrement | 
                         Increment | LessEq | 
-                        GreatEq
+                        GreatEq | LambdaArrow
 
 data Literals = StringLiteral String | 
                 IntegerLiteral String | 

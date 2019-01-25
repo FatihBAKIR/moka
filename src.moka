@@ -2,6 +2,13 @@ import {vec3} from core.types;
 
 struct vertex
 {
-    vec3 position;
-    vec3 normal;
+    vec3 position @1;
+    vec3 normal @2;
 }
+
+vec3 mul(vec3 x, float y)
+{
+    return x * y;
+}
+
+vec3 mul(vec3 x, float y) => x * y

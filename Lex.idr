@@ -23,6 +23,9 @@ tokenize_one '>' = Just RightAngular
 tokenize_one '{' = Just LeftBrace
 tokenize_one '}' = Just RightBrace
 
+tokenize_one '(' = Just LeftParen
+tokenize_one ')' = Just RightParen
+
 tokenize_one '+' = Just Plus
 tokenize_one '-' = Just Minus
 tokenize_one '*' = Just Star
@@ -34,6 +37,8 @@ tokenize_one '.' = Just Dot
 tokenize_one ',' = Just Comma
 tokenize_one ':' = Just Colon
 tokenize_one ';' = Just SemiColon
+
+tokenize_one '@' = Just At
 
 tokenize_one '\'' = Just Quote
 tokenize_one '"' = Just DoubleQuote
@@ -61,6 +66,8 @@ tokenize_two Slash Assign = Just DivAssign
 
 tokenize_two Minus Minus = Just Decrement
 tokenize_two Plus Plus = Just Increment
+
+tokenize_two Assign RightAngular = Just LambdaArrow
 
 tokenize_two _ _ = Nothing
 
