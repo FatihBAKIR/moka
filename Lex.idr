@@ -164,39 +164,39 @@ peek : List a -> Maybe a
 peek [] = Nothing
 peek all@(x::(rst)) = Just x
 
-lex_one' : List Char -> (Token, Nat)
-lex_one' [] = (MkToken "" NullTok, 0)
+lex_one' : List Char -> (Tok, Nat)
+lex_one' [] = (Token "" NullTok, 0)
 lex_one' all@(c::(str)) = case tokenize_one c of
   Just NewLine => case lex_one' str of
-    (MkToken ret_str (Single NewLine), n) => (MkToken (strCons '\n' ret_str) (Single NewLine), n + 1)
-    _ => (MkToken "\n" (Single NewLine), 1)
+    (Token ret_str (Single NewLine), n) => (Token (strCons '\n' ret_str) (Single NewLine), n + 1)
+    _ => (Token "\n" (Single NewLine), 1)
 
   Just Whitespace => case lex_one' str of
     (tok, n) => (tok, n + 1)
 
   Just (Alpha c) => case try_tokenize_name (pack all) of
-    Just s@(Identifier str) => (MkToken str (Id s), length str)
+    Just s@(Identifier str) => (Token str (Id s), length str)
   
   Just (Digit c) => case try_tokenize_number (pack all) of 
-    Just s@(IntegerLiteral str) => (MkToken str (Literal s), length str)
-    Just s@(FloatLiteral str) => (MkToken str (Literal s), length str)
-    Unexpected err => (MkToken "" NullTok, 0)
+    Just s@(IntegerLiteral str) => (Token str (Literal s), length str)
+    Just s@(FloatLiteral str) => (Token str (Literal s), length str)
+    Unexpected err => (Token "" NullTok, 0)
 
-  Just SemiColon => (MkToken ";" (Single SemiColon), 1)
+  Just SemiColon => (Token ";" (Single SemiColon), 1)
 
   Just DoubleQuote => case try_tokenize_string (pack all) False of
-    Just s@(StringLiteral str) => (MkToken str (Literal s), length str)
-    Unexpected err => (MkToken "" NullTok, 0)
+    Just s@(StringLiteral str) => (Token str (Literal s), length str)
+    Unexpected err => (Token "" NullTok, 0)
 
   Just tok => case peek str of
-    Nothing => (MkToken (singleton c) (Single tok), 1)
+    Nothing => (Token (singleton c) (Single tok), 1)
     Just next_c => case tokenize_one next_c of
-      Nothing => (MkToken (singleton c) (Single tok), 1)
+      Nothing => (Token (singleton c) (Single tok), 1)
       Just next_tok => case tokenize_two tok next_tok of
-        Nothing => (MkToken (singleton c) (Single tok), 1)
-        Just res => (MkToken (strCons c (strCons next_c "")) (DoubleT res), 2)
+        Nothing => (Token (singleton c) (Single tok), 1)
+        Just res => (Token (strCons c (strCons next_c "")) (DoubleT res), 2)
   
-  _ => (MkToken "" NullTok, 0)
+  _ => (Token "" NullTok, 0)
 
 try_keywords : NameTok -> Maybe Keywords
 try_keywords (Identifier "struct") = Just Struct
@@ -204,21 +204,22 @@ try_keywords (Identifier "void") = Just Void
 try_keywords (Identifier "import") = Just Import
 try_keywords (Identifier "from") = Just From
 try_keywords _ = Nothing
-  
-lex_one : String -> (Token, Nat)
+
+lex_one : String -> (Tok, Nat)
 lex_one str with (unpack str)
   | x = case lex_one' x of
-    tk@(MkToken res_str (Id name), n) => case try_keywords name of
+    tk@(Token res_str (Id name), n) => case try_keywords name of
       Nothing => tk
-      Just keyw => (MkToken res_str (Keyw keyw), n)
+      Just keyw => (Token res_str (Keyw keyw), n)
     tok => tok
 
 prog : String -> Integer -> String
 prog str 0 = str
 prog str n = prog (strTail str) (n - 1)
 
-lex_many : String -> List Token
+lex_many : String -> List Tok
 lex_many str with (lex_one str)
   | (_, Z) = []
-  | (MkToken _ NullTok, n) = lex_many (prog str (cast n))
+  | (Token _ (Single NewLine), n) = lex_many (prog str (cast n))
+  | (Token _ NullTok, n) = lex_many (prog str (cast n))
   | (tok, n) = tok :: (lex_many (prog str (cast n)))

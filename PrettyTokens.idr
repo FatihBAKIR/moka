@@ -65,5 +65,5 @@ Show TokenType where
   show (Id x) = "Id " ++ (show x)
   show NullTok = "NullTok"
 
-Show Token where
-  show (MkToken text tok) = "Token (" ++ (show tok) ++ ")"
+Show Tok where
+  show (Token text tok) = "Token (" ++ (show tok) ++ ")"

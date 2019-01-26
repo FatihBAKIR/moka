@@ -1,8 +1,13 @@
 module Main
 
 import Lex
+import Parser
+import Tokens
 import PrettyTokens
 import Prelude.Show
+
+extract_tok : Tok -> TokenType
+extract_tok (Token _ tok) = tok
 
 main : IO ()
 main = do

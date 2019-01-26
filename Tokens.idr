@@ -30,7 +30,7 @@ data TokenType =  Keyw Keywords |
                   Id NameTok | 
                   NullTok
         
-record Token where
-    constructor MkToken
+record Tok where
+    constructor Token
     text : String
     tok : TokenType
