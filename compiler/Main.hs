@@ -19,8 +19,12 @@ lex_file path = do
 
 main :: IO()
 main = do
-    [arg] <- getArgs
+    [what, arg] <- getArgs
     tokens <- lex_file arg
-    case parse_struct_def (map_toks tokens) of
-      (Moka.Tokens.Just x, []) -> putStrLn (show x)
-      (Unexpected err, _) -> putStrLn (show err)
+    case what of
+      "lex" -> putStrLn (show tokens)
+      "lex1" -> putStrLn (show (map_toks tokens))
+      "parse" -> case parse_doc (map_toks tokens) of
+        (Moka.Tokens.Just x, []) -> putStrLn (show x)
+        (Moka.Tokens.Just x, rest) -> putStrLn (show x)
+        (Unexpected err, _) -> putStrLn (show err)

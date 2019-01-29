@@ -1,50 +1,54 @@
 module Moka.StructParser where
 
+import Moka.ExprParser
 import Moka.Tokens
 import Moka.Grammar
-import Moka.ExprParser
+import Moka.ParserCommon
 
 parse_member_def  :: [TokenType] -> (Expected DataMember    ParseError, [TokenType])
 parse_member_defs :: [TokenType] -> (Expected [DataMember]  ParseError, [TokenType])
 parse_struct_def  :: [TokenType] -> (Expected StructDef     ParseError, [TokenType])
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   (Single At):
                   (Literal l_id@(IntegerLiteral n)):
                   (Single SemiColon):
                   rest) = 
   (Moka.Tokens.Just (LayoutedMem (TypeN typetok) nametok (Layout l_id)), rest)
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   (Single At):
-                  (Literal l_id@(IntegerLiteral n)):rest) = (Unexpected MissingSemicolon, [])
+                  (Literal l_id@(IntegerLiteral n)):
+                  rest) = (Unexpected MissingSemicolon, [])
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   (Single At):rest) = (Unexpected MissingLayoutId, [])
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
-                  (Single Assign):(Single SemiColon):rest) = (Unexpected MissingInitializer, [])
+parse_member_def ((Id typetok):
+                  (Id nametok):
+                  (Single Assign):
+                  (Single SemiColon):
+                  rest) = (Unexpected MissingInitializer, [])
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   (Single Assign):
                   rest) = case parse_expr rest of
   (Moka.Tokens.Just expr, (Single SemiColon):rem) -> (Moka.Tokens.Just (InitMem (TypeN typetok) nametok expr), rem)
   (Moka.Tokens.Just expr, rem) -> (Unexpected MissingSemicolon, [])
   (Unexpected err, rem) -> (Unexpected err, [])
   
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   (Single SemiColon):
                   rest) = 
   (Moka.Tokens.Just (RawMem (TypeN typetok) nametok), rest)
 
-parse_member_def ((Id typetok@(Identifier type_name)):
-                  (Id nametok@(Identifier name)):
+parse_member_def ((Id typetok):
+                  (Id nametok):
                   rest) = (Unexpected MissingSemicolon, [])
 
 parse_member_def lst = (Unexpected NoMatch, lst)
@@ -66,4 +70,4 @@ parse_struct_def ((Keyw Struct):
   (Moka.Tokens.Just defs, rem) -> (Unexpected UnclosedBrace, [])
   (Unexpected err, _) -> (Unexpected err, [])
 
-parse_struct_def _ = (Unexpected MissingStruct, [])
+parse_struct_def _ = (Unexpected NoMatch, [])

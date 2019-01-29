@@ -1,0 +1,15 @@
+struct rgb
+{
+    float r;
+    float g; 
+    float b;
+}
+
+struct pos3
+{
+    float x;
+    float y;
+    float z;
+}
+
+union vec3 = unsafe rgb | pos3 | float[3];

@@ -7,14 +7,15 @@ data SingleCharTokens = Plus | Assign | Slash | Dot | Star | Comma
                         | Minus | SemiColon | LeftAngular | RightAngular
                         | Digit Char | Alpha Char | Underscore | Whitespace
                         | LeftBrace | RightBrace | LeftParen | RightParen
-                        | At
+                        | At | Bar | LeftBracket | RightBracket
                         deriving Show
 
 data DoubleCharTokens = EqEq | PlusAssign | 
                         MinusAssign | MulAssign | 
                         DivAssign | Decrement | 
                         Increment | LessEq | 
-                        GreatEq | LambdaArrow
+                        GreatEq | LambdaArrow |
+                        SlashSlash | SlashStar | StarSlash
                         deriving Show
 
 data Literals = StringLiteral String | 
@@ -25,7 +26,7 @@ data Literals = StringLiteral String |
 data NameTok =  Identifier String
                 deriving Show
 
-data Keywords = Struct | Void | Import | From
+data Keywords = Struct | Void | Import | From | Extern | Union | Unsafe
                 deriving Show
 
 data TokenType =  Keyw Keywords | 
@@ -35,5 +36,9 @@ data TokenType =  Keyw Keywords |
                   Id NameTok | 
                   NullTok
                   deriving Show
-        
-data Tok = Token String TokenType deriving Show
+
+data Pos = Int Int deriving Show
+
+data Tok =  Token String TokenType | 
+            TokenT Pos TokenType 
+            deriving Show

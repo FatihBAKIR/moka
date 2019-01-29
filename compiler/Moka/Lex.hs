@@ -15,6 +15,9 @@ tokenize_one '}' = Prelude.Just RightBrace
 tokenize_one '(' = Prelude.Just LeftParen
 tokenize_one ')' = Prelude.Just RightParen
 
+tokenize_one '[' = Prelude.Just LeftBracket
+tokenize_one ']' = Prelude.Just RightBracket
+
 tokenize_one '+' = Prelude.Just Plus
 tokenize_one '-' = Prelude.Just Minus
 tokenize_one '*' = Prelude.Just Star
@@ -38,6 +41,8 @@ tokenize_one '\n' = Prelude.Just NewLine
 tokenize_one '\t' = Prelude.Just Whitespace
 tokenize_one ' ' = Prelude.Just Whitespace
 
+tokenize_one '|' = Prelude.Just Bar
+
 tokenize_one x
   | isAlphaNum x = if isAlpha x then Prelude.Just (Alpha x) else Prelude.Just (Digit x)
   | otherwise = Nothing
@@ -57,6 +62,10 @@ tokenize_two Minus Minus = Prelude.Just Decrement
 tokenize_two Plus Plus = Prelude.Just Increment
 
 tokenize_two Assign RightAngular = Prelude.Just LambdaArrow
+
+tokenize_two Slash Slash = Prelude.Just SlashSlash
+tokenize_two Slash Star = Prelude.Just SlashStar
+tokenize_two Star Slash = Prelude.Just StarSlash
 
 tokenize_two _ _ = Nothing
 
@@ -135,6 +144,8 @@ tokenize_number (c:rst) has_dot is_hex = case tokenize_one c of
     (SemiColon, _) -> Unexpected Fin
     (Colon, _) -> Unexpected Fin
     (RightParen, _) -> Unexpected Fin
+    (RightBracket, _) -> Unexpected Fin
+    (RightBrace, _) -> Unexpected Fin
     (Plus, _) -> Unexpected Fin
     (Minus, _) -> Unexpected Fin
     (Star, _) -> Unexpected Fin
@@ -201,6 +212,9 @@ try_keywords (Identifier "struct") = Prelude.Just Struct
 try_keywords (Identifier "void") = Prelude.Just Void
 try_keywords (Identifier "import") = Prelude.Just Import
 try_keywords (Identifier "from") = Prelude.Just From
+try_keywords (Identifier "extern") = Prelude.Just Extern
+try_keywords (Identifier "union") = Prelude.Just Union
+try_keywords (Identifier "unsafe") = Prelude.Just Unsafe
 try_keywords _ = Nothing
 
 lex_one :: String -> (Tok, Int)
@@ -214,9 +228,32 @@ prog :: String -> Int -> String
 prog str 0 = str
 prog (_:str) n = prog str (n - 1)
 
-lex_many :: String -> [Tok]
-lex_many str = case lex_one str of
+lex_many' :: String -> [Tok]
+lex_many' str = case lex_one str of
   (_, 0) -> []
-  (Token _ (Single NewLine), n) -> lex_many (prog str n)
-  (Token _ NullTok, n) -> lex_many (prog str n)
-  (tok, n) -> tok : (lex_many (prog str n))
+  (Token _ NullTok, n) -> lex_many' (prog str n)
+  (tok, n) -> tok : (lex_many' (prog str n))
+
+is_newline' :: Tok -> Bool
+is_newline' (Token _ (Single NewLine)) = True
+is_newline' _ = False
+
+find_slice :: [Tok] -> (Tok -> Bool) -> [Tok]
+find_slice (x:rst) fun = case fun x of
+  True -> (x:rst)
+  False -> find_slice rst fun
+find_slice [] _ = []
+
+rm_comments :: [Tok] -> [Tok]
+rm_comments ((Token _ (DoubleT SlashSlash)):toks) = case find_slice toks is_newline' of
+  ((Token _ (Single NewLine)):rst) -> rm_comments rst
+  _ -> []
+rm_comments (x:rst) = (x:(rm_comments rst))
+rm_comments [] = []
+
+rm_newlines :: [Tok] -> [Tok]
+rm_newlines toks = [tok | tok <- toks, not (is_newline' tok)]
+
+lex_many :: String -> [Tok]
+lex_many str = let orig = lex_many' str in
+  rm_newlines (rm_comments orig) 

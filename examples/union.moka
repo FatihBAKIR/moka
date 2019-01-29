@@ -1,0 +1,2 @@
+union type = int | float;
+union another = unsafe int | float;

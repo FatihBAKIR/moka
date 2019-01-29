@@ -1,5 +1,6 @@
+// hello world
 struct vertex
 {
-    vec3 position @1;
+    vec3 position @1; // hello
     vec3 normal @2;
 }

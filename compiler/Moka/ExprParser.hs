@@ -2,16 +2,7 @@ module Moka.ExprParser where
 
 import Moka.Grammar
 import Moka.Tokens
-
-data ParseError = UnclosedParen | 
-                  NoMatch | 
-                  Unknown | 
-                  MissingSemicolon | 
-                  MissingStruct |
-                  UnclosedBrace |
-                  MissingLayoutId |
-                  MissingInitializer
-                  deriving Show
+import Moka.ParserCommon
 
 parse_literal_expr    :: [TokenType] -> (Expected Expression ParseError, [TokenType])
 parse_paren_expr      :: [TokenType] -> (Expected Expression ParseError, [TokenType])

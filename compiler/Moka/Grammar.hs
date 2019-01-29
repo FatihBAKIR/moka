@@ -2,9 +2,12 @@ module Moka.Grammar where
 
 import Moka.Tokens
 
-data TypeName = TypeN NameTok deriving Show
+data TypeName = TypeN NameTok | 
+                ArrayN NameTok Int 
+                deriving Show
 
-data LayoutId = Layout Literals deriving Show
+data LayoutId = Layout Literals 
+                deriving Show
 
 data Expression = Lit Literals | 
                   Bin TokenType Expression Expression |
@@ -18,4 +21,11 @@ data DataMember = RawMem TypeName NameTok |
                   InitMem TypeName NameTok Expression
                   deriving Show
 
+data Comment = Line String | Block String
+
 data StructDef = Structure NameTok [DataMember] deriving Show
+data UnionDef = UnionT NameTok [TypeName] | UnsafeUnion NameTok [TypeName] deriving Show
+
+data TypeDef = U UnionDef | S StructDef | Extern TypeDef deriving Show
+
+data Moka = Doc [TypeDef] deriving Show
