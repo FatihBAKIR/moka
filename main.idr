@@ -4,19 +4,13 @@ import Lex
 import Parser
 import Tokens
 import PrettyTokens
-import Prelude.Show
 import Grammar
 
 extract_tok : Tok -> TokenType
 extract_tok (Token _ tok) = tok
 
-parse_file : String -> IO (Expected StructDef ParseError)
-parse_file path = do
-  file <- readFile path
-  case file of
-    Right str => case parse_struct_def (map extract_tok (lex_many str)) of
-      (x, _) => pure(x)
-    Left _ => pure(Unexpected Unknown)
+map_toks : List Tok -> List TokenType
+map_toks = map extract_tok
 
 lex_file : String -> IO (List Tok)
 lex_file path = do
@@ -25,15 +19,16 @@ lex_file path = do
     Right str => pure(lex_many str)
     Left _ => pure([])
 
+do_parse : List Tok -> String
+do_parse tokens = case parse_struct_def (map_toks tokens) of
+  (Just (Structure (Identifier name) mems), _) => name ++ " " ++ (show (length mems))
+  _ => "can't parse"
+
 main : IO ()
 main = do
   [prog, what, arg] <- getArgs
+  tokens <- lex_file arg
   case what of
     "lex" => do
-      tokens <- lex_file arg
       putStrLn (show tokens)
-    "parse" => do
-      def <- parse_file arg
-      case def of
-        Just x => putStrLn "success!"
-        Unexpected err => putStrLn "error!"
+    "parse" => putStrLn (do_parse tokens)
