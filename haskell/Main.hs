@@ -3,8 +3,9 @@ module Main where
 import Moka
 import Moka.Lex
 import Moka.Tokens
+import Moka.Grammar
+import Moka.Parser
 import System.Environment
-
 
 extract_tok :: Tok -> TokenType
 extract_tok (Token _ tok) = tok
@@ -20,4 +21,6 @@ main :: IO()
 main = do
     [arg] <- getArgs
     tokens <- lex_file arg
-    putStrLn (show (map_toks tokens))
+    case parse_struct_def (map_toks tokens) of
+      (Moka.Tokens.Just x, []) -> putStrLn (show x)
+      (Unexpected err, _) -> putStrLn (show err)
