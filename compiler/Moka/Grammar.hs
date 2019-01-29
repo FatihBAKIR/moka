@@ -3,7 +3,7 @@ module Moka.Grammar where
 import Moka.Tokens
 
 data TypeName = TypeN NameTok | 
-                ArrayN NameTok Int 
+                ArrayN TypeName Int 
                 deriving Show
 
 data LayoutId = Layout Literals 

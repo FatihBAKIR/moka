@@ -26,7 +26,14 @@ data Literals = StringLiteral String |
 data NameTok =  Identifier String
                 deriving Show
 
-data Keywords = Struct | Void | Import | From | Extern | Union | Unsafe
+data Keywords = Struct | 
+                Void | 
+                Import | 
+                From | 
+                Extern | 
+                Union | 
+                Unsafe |
+                Using
                 deriving Show
 
 data TokenType =  Keyw Keywords | 
