@@ -3,4 +3,4 @@ struct arr_struct
     float[3] arr;
 }
 
-union mat3 = float[3][3];
+using mat3 = float[3][3];
