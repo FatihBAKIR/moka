@@ -2,6 +2,8 @@ module Lex
 
 %access public export
 
+data Expected t e = Just t | Unexpected e
+
 data SingleCharTokens = Plus | Assign | Slash | Dot | Star | Comma 
                         | Colon | Percent | Quote | DoubleQuote | NewLine
                         | Minus | SemiColon | LeftAngular | RightAngular

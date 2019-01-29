@@ -6,8 +6,6 @@ import PrettyTokens
 
 %access public export
 
-data Expected t e = Just t | Unexpected e
-
 get_char : SingleCharTokens -> Char
 get_char (Digit c) = c
 get_char (Alpha c) = c
@@ -141,6 +139,10 @@ tokenize_number str has_dot is_hex with (tokenize_one (strHead str))
     (SemiColon, _) => Unexpected Fin
     (Colon, _) => Unexpected Fin
     (RightParen, _) => Unexpected Fin
+    (Plus, _) => Unexpected Fin
+    (Minus, _) => Unexpected Fin
+    (Star, _) => Unexpected Fin
+    (Slash, _) => Unexpected Fin
     
     (Dot, rst) => case has_dot of
       True => Unexpected MultipleDots

@@ -8,17 +8,13 @@ data TypeName = TypeN NameTok
 
 data LayoutId = Layout Literals
 
-data Operators = Op TokenType
-
 data Expression : Type
 
-data BinaryExpr = Binary Expression Operators Expression
-data UnaryExpr = Unary Operators Expression
-
 data Expression = Lit Literals | 
-                  Bin BinaryExpr |
-                  Un UnaryExpr |
-                  Paren Expression
+                  Bin TokenType Expression Expression |
+                  Un TokenType Expression |
+                  Paren Expression |
+                  Empty
 
 data DataMember = RawMem TypeName NameTok | 
                   LayoutedMem TypeName NameTok LayoutId |
