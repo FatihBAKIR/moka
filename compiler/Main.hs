@@ -6,6 +6,7 @@ import Moka.Tokens
 import Moka.Grammar
 import Moka.Parser
 import System.Environment
+import Moka.Codegen.CppGen
 
 extract_tok :: Tok -> TokenType
 extract_tok (Token _ tok) = tok
@@ -26,5 +27,4 @@ main = do
       "lex1" -> putStrLn (show (map_toks tokens))
       "parse" -> case parse_doc (map_toks tokens) of
         (Moka.Tokens.Just x, []) -> putStrLn (show x)
-        (Moka.Tokens.Just x, rest) -> putStrLn (show x)
         (Unexpected err, _) -> putStrLn (show err)
