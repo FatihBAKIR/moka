@@ -51,6 +51,7 @@ parse_unary_expr ((Single Minus):rest) = help (parse_expr rest) where
 parse_unary_expr l = parse_id_expr l
 
 parse_arguments :: [TokenType] -> (Expected [Expression] ParseError, [TokenType])
+parse_arguments ((Single RightParen):rem) = (Moka.Tokens.Just [], rem)
 parse_arguments l = case parse_expr l of
   (Unexpected err, _) -> (Unexpected err, l)
   (Moka.Tokens.Just x, (Single RightParen):rem) -> (Moka.Tokens.Just [x], rem)

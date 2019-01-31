@@ -3,16 +3,19 @@ module Moka.Semantic.Types where
 import Moka.Grammar
 import Moka.Tokens
 
-data TypeInfo = BuiltIn String
+import Moka.Semantic.Unit
+
+data TypeInfo = BuiltIn String |
+                UserType TypeName
                 deriving Show
 
 class DeclType x where
-    decltype :: x -> TypeInfo
+    decltype :: SymTable -> x -> TypeInfo
 
 instance DeclType Literals where
-    decltype (IntegerLiteral _) = BuiltIn "int"
-    decltype (FloatLiteral _) = BuiltIn "float"
-    decltype (StringLiteral _) = BuiltIn "string"
+    decltype _ (IntegerLiteral _) = BuiltIn "int"
+    decltype _ (FloatLiteral _) = BuiltIn "float"
+    decltype _ (StringLiteral _) = BuiltIn "string"
 
 bin_decltype :: TokenType -> TypeInfo -> TypeInfo -> TypeInfo
 
@@ -23,8 +26,14 @@ bin_decltype _ (BuiltIn "int") a@(BuiltIn "float") = a
 bin_decltype _ a@(BuiltIn x) (BuiltIn y)
   | x == y = a
 
+fun_decltype :: SymTable -> FuncDef -> TypeInfo
+fun_decltype _ (Function _ tp _ _) = UserType tp
+fun_decltype x (ShortFun _ _ expr) = decltype x expr
+
 instance DeclType Expression where
-    decltype (Lit l) = decltype l
-    decltype (Un op expr) = decltype expr
-    decltype (Bin op expr1 expr2) = bin_decltype op (decltype expr1) (decltype expr2)
-    decltype (Paren expr) = decltype expr
+    decltype x (Lit l) = decltype x l
+    decltype x (Un op expr) = decltype x expr
+    decltype x (Bin op expr1 expr2) = bin_decltype op (decltype x expr1) (decltype x expr2)
+    decltype x (Paren expr) = decltype x expr
+    decltype x (FunCall (Identifier name) args) = case get_sym x name of
+        Prelude.Just (F f) -> fun_decltype x f

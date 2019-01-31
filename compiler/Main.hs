@@ -9,6 +9,7 @@ import System.Environment
 import Moka.Codegen.CppGen
 
 import Moka.Semantic.Types
+import Moka.Semantic.Unit
 
 extract_tok :: Tok -> TokenType
 extract_tok (Token _ tok) = tok
@@ -27,9 +28,11 @@ main = do
     [what, arg] <- getArgs
     tokens <- lex_file arg
     let toks = map_toks tokens
+    let ast = get_ast $ parse_doc toks
+    let syms = build_symtbl $ ast
     case what of
       "lex" -> putStrLn (show tokens)
       "lex1" -> putStrLn (show toks)
-      "parse" -> case parse_doc toks of
-        (Moka.Tokens.Just x, []) -> putStrLn (show x)
-        (Unexpected err, _) -> putStrLn (show err)
+      "parse" -> putStrLn $ show ast
+      "syms" -> do 
+        putStrLn $ show $ to_list syms

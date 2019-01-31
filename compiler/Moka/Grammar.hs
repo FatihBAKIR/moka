@@ -37,6 +37,6 @@ data StructDef = Structure NameTok [DataMember] deriving Show
 data UnionDef = UnionT NameTok [TypeName] | UnsafeUnion NameTok [TypeName] deriving Show
 data UsingDef = Alias NameTok TypeName deriving Show
 
-data Definiton = F FuncDef | U UnionDef | S StructDef | A UsingDef | Extern Definiton deriving Show
+data Definition = F FuncDef | U UnionDef | S StructDef | A UsingDef | Extern Definition deriving Show
 
-data Moka = Doc [Definiton] deriving Show
+data Moka = Doc [Definition] deriving Show

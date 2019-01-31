@@ -23,6 +23,7 @@ executable moka
     text,
     aeson,
     stache,
-    megaparsec
+    megaparsec,
+    hashtables
   -- hs-source-dirs:      
   default-language:    Haskell2010
