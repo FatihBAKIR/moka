@@ -9,7 +9,8 @@ data TypeName = TypeN NameTok |
 data LayoutId = Layout Literals 
                 deriving Show
 
-data Expression = Lit Literals | 
+data Expression = Fun NameTok [Expression] |
+                  Lit Literals | 
                   Bin TokenType Expression Expression |
                   Un TokenType Expression |
                   Paren Expression |

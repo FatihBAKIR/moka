@@ -33,7 +33,10 @@ data Keywords = Struct |
                 Extern | 
                 Union | 
                 Unsafe |
-                Using
+                Using |
+                Var | Const |
+                If | Else |
+                For
                 deriving Show
 
 data TokenType =  Keyw Keywords | 

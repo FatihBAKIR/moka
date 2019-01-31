@@ -216,6 +216,11 @@ try_keywords (Identifier "extern") = Prelude.Just Extern
 try_keywords (Identifier "union") = Prelude.Just Union
 try_keywords (Identifier "unsafe") = Prelude.Just Unsafe
 try_keywords (Identifier "using") = Prelude.Just Using
+try_keywords (Identifier "var") = Prelude.Just Var
+try_keywords (Identifier "const") = Prelude.Just Const
+try_keywords (Identifier "if") = Prelude.Just If
+try_keywords (Identifier "else") = Prelude.Just Else
+try_keywords (Identifier "for") = Prelude.Just For
 try_keywords _ = Nothing
 
 lex_one :: String -> (Tok, Int)

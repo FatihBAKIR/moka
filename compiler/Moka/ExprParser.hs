@@ -4,6 +4,7 @@ import Moka.Grammar
 import Moka.Tokens
 import Moka.ParserCommon
 
+--parse_funcall_expr    :: [TokenType] -> (Expected Expression ParseError, [TokenType])
 parse_literal_expr    :: [TokenType] -> (Expected Expression ParseError, [TokenType])
 parse_paren_expr      :: [TokenType] -> (Expected Expression ParseError, [TokenType])
 parse_hi_binary_expr  :: [TokenType] -> (Expected Expression ParseError, [TokenType])

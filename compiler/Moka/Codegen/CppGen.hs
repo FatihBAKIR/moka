@@ -1,7 +1,24 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Moka.Codegen.CppGen where
 
 import Moka.Grammar
 import Moka.Tokens
+import Data.Aeson
+
+import Text.Megaparsec
+import Text.Mustache
+
+obj = object
+  [ "name"   .= ("John" :: String)
+  , "things" .= ["pen" :: String, "candle", "egg"]
+  ]
+
+template :: Template
+template = case compileMustacheText "" "Hi, {{name}}! You have:\n{{#things}}\n  * {{.}}\n{{/things}}\n" of
+  Right t -> t
+
+use = renderMustache template obj
 
 add_newline :: String -> String
 add_newline x = x ++ "\n"
