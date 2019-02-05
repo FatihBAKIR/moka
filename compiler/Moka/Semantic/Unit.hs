@@ -16,6 +16,7 @@ get_def_name (U (UnionT (Identifier name) _)) = name
 get_def_name (U (UnsafeUnion (Identifier name) _)) = name
 get_def_name (S (Structure (Identifier name) _)) = name
 get_def_name (A (Alias (Identifier name) _)) = name
+get_def_name (F (ShortFun (Identifier name) _ _ _)) = name
 
 get_sym :: SymTable -> String -> Maybe Definition
 get_sym tbl name = unsafePerformIO $ do

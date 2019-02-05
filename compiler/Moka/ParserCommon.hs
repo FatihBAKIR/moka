@@ -2,6 +2,7 @@ module Moka.ParserCommon where
     
 import Moka.Tokens
 import Moka.Grammar
+import Moka
 
 data ParseError = UnclosedParen | 
                   NoMatch | 
@@ -10,7 +11,8 @@ data ParseError = UnclosedParen |
                   MissingStruct |
                   UnclosedBrace |
                   MissingLayoutId |
-                  MissingInitializer
+                  MissingInitializer |
+                  CantInferParam
                   deriving Show
 
 parse_array :: TypeName -> [TokenType] -> (Expected TypeName ParseError, [TokenType])
@@ -20,7 +22,7 @@ parse_array base ((Single LeftBracket):
                   (Single RightBracket):rem) =
   parse_array (ArrayN base (read n :: Int)) rem
 
-parse_array base rem = (Moka.Tokens.Just base, rem) 
+parse_array base rem = (Moka.Just base, rem) 
 
 parse_typename :: [TokenType] -> (Expected TypeName ParseError, [TokenType])
 
@@ -31,7 +33,10 @@ parse_typename ((Id typename):
                 rest)) =
   parse_array (TypeN typename) all
 
+parse_typename ((Keyw Auto):rest) =
+  (Moka.Just Infer, rest)
+
 parse_typename ((Id typename):rest) =
-  (Moka.Tokens.Just (TypeN typename), rest)
+  (Moka.Just (TypeN typename), rest)
 
 parse_typename l = (Unexpected NoMatch, l)

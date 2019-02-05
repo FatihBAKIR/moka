@@ -1,5 +1,6 @@
 module Moka.Lex where
 
+import Moka
 import Moka.Tokens
 import Data.Char
 
@@ -42,6 +43,7 @@ tokenize_one '\t' = Prelude.Just Whitespace
 tokenize_one ' ' = Prelude.Just Whitespace
 
 tokenize_one '|' = Prelude.Just Bar
+tokenize_one '&' = Prelude.Just Ampersand
 
 tokenize_one x
   | isAlphaNum x = if isAlpha x then Prelude.Just (Alpha x) else Prelude.Just (Digit x)
@@ -90,17 +92,17 @@ data StringParseErrors = NewLineInString | UnterminatedString | Done deriving Sh
 try_tokenize_string :: String -> Bool -> Expected Literals StringParseErrors
 try_tokenize_string "" _ = Unexpected Done
 
-try_tokenize_string ('"':_) True = Moka.Tokens.Just (StringLiteral "\"")
+try_tokenize_string ('"':_) True = Moka.Just (StringLiteral "\"")
 
 try_tokenize_string ('"':rest) False = case try_tokenize_string rest True of
-  Moka.Tokens.Just (StringLiteral res_str) -> Moka.Tokens.Just (StringLiteral ('"':res_str))
+  Moka.Just (StringLiteral res_str) -> Moka.Just (StringLiteral ('"':res_str))
   Unexpected err -> Unexpected err
 
 try_tokenize_string ('\n':_) _ = Unexpected NewLineInString
 try_tokenize_string (_:"") _ = Unexpected UnterminatedString
 
 try_tokenize_string (c:rest) open = case try_tokenize_string rest open of
-  Moka.Tokens.Just (StringLiteral res_str) -> Moka.Tokens.Just (StringLiteral (c:res_str))
+  Moka.Just (StringLiteral res_str) -> Moka.Just (StringLiteral (c:res_str))
   Unexpected err -> Unexpected err
 
 legal_in_number :: SingleCharTokens -> Bool -> Bool
@@ -156,14 +158,14 @@ tokenize_number (c:rst) has_dot is_hex = case tokenize_one c of
       False -> case tokenize_number rst True is_hex of
         Unexpected Fin -> Unexpected Fin
         Unexpected x -> Unexpected x
-        Moka.Tokens.Just (IntegerLiteral str) -> Moka.Tokens.Just (FloatLiteral ('.':str))
+        Moka.Just (IntegerLiteral str) -> Moka.Just (FloatLiteral ('.':str))
 
     (tok, rst) -> case legal_in_number tok is_hex of
       False -> Unexpected IllegalChar
       True -> case tokenize_number rst has_dot is_hex of
-        Moka.Tokens.Just (IntegerLiteral str) -> Moka.Tokens.Just (IntegerLiteral ((get_char tok):str))
-        Moka.Tokens.Just (FloatLiteral str) -> Moka.Tokens.Just (FloatLiteral ((get_char tok):str))
-        Unexpected Fin -> Moka.Tokens.Just (IntegerLiteral [get_char tok])
+        Moka.Just (IntegerLiteral str) -> Moka.Just (IntegerLiteral ((get_char tok):str))
+        Moka.Just (FloatLiteral str) -> Moka.Just (FloatLiteral ((get_char tok):str))
+        Unexpected Fin -> Moka.Just (IntegerLiteral [get_char tok])
         Unexpected x -> Unexpected x
 
 try_tokenize_number :: String -> Expected Literals NumParseErrors
@@ -187,14 +189,14 @@ lex_one' all@(c:(str)) = case tokenize_one c of
     Prelude.Just s@(Identifier str) -> (Token str (Id s), length str)
   
   Prelude.Just (Digit c) -> case try_tokenize_number all of 
-    Moka.Tokens.Just s@(IntegerLiteral str) -> (Token str (Literal s), length str)
-    Moka.Tokens.Just s@(FloatLiteral str) -> (Token str (Literal s), length str)
+    Moka.Just s@(IntegerLiteral str) -> (Token str (Literal s), length str)
+    Moka.Just s@(FloatLiteral str) -> (Token str (Literal s), length str)
     Unexpected err -> (Token "" NullTok, 0)
 
   Prelude.Just SemiColon -> (Token ";" (Single SemiColon), 1)
 
   Prelude.Just DoubleQuote -> case try_tokenize_string all False of
-    Moka.Tokens.Just s@(StringLiteral str) -> (Token str (Literal s), length str)
+    Moka.Just s@(StringLiteral str) -> (Token str (Literal s), length str)
     Unexpected err -> (Token "" NullTok, 0)
 
   Prelude.Just tok -> case peek str of
@@ -221,6 +223,7 @@ try_keywords (Identifier "const") = Prelude.Just Const
 try_keywords (Identifier "if") = Prelude.Just If
 try_keywords (Identifier "else") = Prelude.Just Else
 try_keywords (Identifier "for") = Prelude.Just For
+try_keywords (Identifier "auto") = Prelude.Just Auto
 try_keywords _ = Nothing
 
 lex_one :: String -> (Tok, Int)

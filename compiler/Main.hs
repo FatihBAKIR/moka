@@ -16,7 +16,7 @@ extract_tok (Token _ tok) = tok
 
 map_toks = map extract_tok
 
-get_ast (Moka.Tokens.Just x, []) = x
+get_ast (Moka.Just x, []) = x
 
 lex_file :: String -> IO ([Tok])
 lex_file path = do

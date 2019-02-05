@@ -1,9 +1,1 @@
-import { vec3 } from "core";
-import { vertex } from "./vertex";
-
-vec3 mul(vec3 x, float y)
-{
-    return x * (y + 100) * 5.0;
-}
-
-vec3 mul(vec3 x, float y) => x * y
+vec3 mull(vec3 x, float y) => x * y

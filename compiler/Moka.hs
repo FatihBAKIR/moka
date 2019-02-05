@@ -1,5 +1,3 @@
 module Moka where
 
-import Moka.Lex
-import Moka.Tokens
-import Moka.Grammar
+data Expected t e = Just t | Unexpected e deriving Show

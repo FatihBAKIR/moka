@@ -1,13 +1,11 @@
 module Moka.Tokens where
 
-data Expected t e = Just t | Unexpected e deriving Show
-
 data SingleCharTokens = Plus | Assign | Slash | Dot | Star | Comma 
                         | Colon | Percent | Quote | DoubleQuote | NewLine
                         | Minus | SemiColon | LeftAngular | RightAngular
                         | Digit Char | Alpha Char | Underscore | Whitespace
                         | LeftBrace | RightBrace | LeftParen | RightParen
-                        | At | Bar | LeftBracket | RightBracket
+                        | At | Bar | Ampersand | LeftBracket | RightBracket
                         deriving Show
 
 data DoubleCharTokens = EqEq | PlusAssign | 
@@ -36,7 +34,8 @@ data Keywords = Struct |
                 Using |
                 Var | Const |
                 If | Else |
-                For
+                For |
+                Auto
                 deriving Show
 
 data TokenType =  Keyw Keywords | 

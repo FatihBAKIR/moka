@@ -28,7 +28,8 @@ bin_decltype _ a@(BuiltIn x) (BuiltIn y)
 
 fun_decltype :: SymTable -> FuncDef -> TypeInfo
 fun_decltype _ (Function _ tp _ _) = UserType tp
-fun_decltype x (ShortFun _ _ expr) = decltype x expr
+fun_decltype x (ShortFun _ Infer _ expr) = decltype x expr
+fun_decltype x (ShortFun _ tp _ expr) = UserType tp
 
 instance DeclType Expression where
     decltype x (Lit l) = decltype x l

@@ -3,7 +3,8 @@ module Moka.Grammar where
 import Moka.Tokens
 
 data TypeName = TypeN NameTok | 
-                ArrayN TypeName Int 
+                ArrayN TypeName Int |
+                Infer
                 deriving Show
 
 data LayoutId = Layout Literals 
@@ -30,7 +31,7 @@ data Statement =  Expr Expression deriving Show
 data Param = NamedParam TypeName NameTok | UnnamedParam TypeName deriving Show
 
 data FuncDef =  Function NameTok TypeName [Param] [Statement] | 
-                ShortFun NameTok [Param] Expression
+                ShortFun NameTok TypeName [Param] Expression
                 deriving Show
 
 data StructDef = Structure NameTok [DataMember] deriving Show
